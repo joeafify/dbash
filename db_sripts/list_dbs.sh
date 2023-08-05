@@ -23,9 +23,9 @@ then
     if [[ ! -r  databases/ ]]
     then
         bash shared_scripts/message.sh "The databases directory did not have read premision ... Do you want to add read permission?" "warn"
-        select choise in "yes" "no"
+        select choice in "yes" "no"
         do
-            case $choise in
+            case $choice in
                 "yes")
                     chmod +r databases/
                     bash shared_scripts/message.sh "Changed permission" "success"
@@ -35,7 +35,7 @@ then
                     bash shared_scripts/message.sh "Sorry but we are not able to change permission without your approval\nCome back when you are ready to change permission" "warn"
                     bash ./main.sh
                 ;;
-                *) echo "Please enter a valid choise"
+                *) echo "Please enter a valid choice"
                 ;;
             esac
         done
