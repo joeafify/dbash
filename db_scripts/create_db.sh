@@ -19,6 +19,12 @@ function create_database {
         (Type 'exit' to exit the program)
         New Database name: " db_name
 
+        # Check if the database name is empty
+        if [ -z "$db_name" ]; then
+            echo "Error: Database name cannot be empty."
+            continue
+        fi
+
                # Check if the database already exists
         if [ -d "databases/$db_name" ]; then
             echo "Error: Database '$db_name' already exists."
@@ -37,12 +43,6 @@ function create_database {
         if [ "$db_name" = "exit" ]; then
             echo "Exiting the program..."
             exit 0
-        fi
-
-        # Check if the database name is empty
-        if [ -z "$db_name" ]; then
-            echo "Error: Database name cannot be empty."
-            continue
         fi
 
         # Check if the database name starts with a number, hyphen, or underscore
