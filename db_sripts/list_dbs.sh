@@ -28,14 +28,14 @@ then
             case $choise in
                 "yes")
                     chmod +r databases/
-                    bash shared_scripts/message.sh "Changied permission" "success"
+                    bash shared_scripts/message.sh "Changed permission" "success"
                     list_databases
                 ;;
                 "no")
-                    bash shared_scripts/message.sh "Sorry but we are not able to a change permission without your approval\nCome back when you are ready to change permission" "warn"
+                    bash shared_scripts/message.sh "Sorry but we are not able to change permission without your approval\nCome back when you are ready to change permission" "warn"
                     bash ./main.sh
                 ;;
-                *) echo "Please enter a valid chiose"
+                *) echo "Please enter a valid choise"
                 ;;
             esac
         done
