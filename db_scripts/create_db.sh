@@ -16,7 +16,7 @@ function create_database {
         (Avoid spaces and special characters except '-' or '_')
         (You can't start with a number or a hyphen/underscore)
         (You can't end with a hyphen or underscore)
-        (Type 'exit' to exit the program)
+        (Type 'exit' to return to main menu)
         New Database name: " db_name
 
         # Check if the database name is empty
@@ -41,7 +41,7 @@ function create_database {
 
         # Check if the user wants to exit the program
         if [ "$db_name" = "exit" ]; then
-            echo "Exiting the program..."
+            echo "returning to main menu..."
             exit 0
         fi
 
