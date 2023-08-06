@@ -17,7 +17,7 @@ function create_database {
         (You can't start with a number or a hyphen/underscore)
         (You can't end with a hyphen or underscore)
         (Type 'exit' to return to main menu)
-        New Database name: " db_name
+        New database name: " db_name
 
         # Check if the database name is empty
         if [ -z "$db_name" ]; then
@@ -63,20 +63,6 @@ function create_database {
             echo "Allowed characters are: A-Z, a-z, 0-9, hyphen (-), underscore (_)."
             echo "Name cannot be just numbers, hyphens -, or underscores _."
             continue
-        fi
-
-        # Check if the database already exists
-        if [ -d "databases/$db_name" ]; then
-            echo "Error: Database '$db_name' already exists."
-            continue
-        fi
-
-        # If all checks pass, create the new database directory
-        if [ ! -d "databases" ]; then
-            echo "Warning: The 'databases' directory is missing."
-            echo "Creating 'databases' directory..."
-            mkdir "databases"
-            echo "'databases' directory created successfully."
         fi
 
         mkdir "databases/$db_name"
