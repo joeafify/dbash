@@ -31,12 +31,30 @@ function create_table {
 
         # Check if the table file already exists
         if [ -e "$table_file" ]; then
-            read -r -p "Table file '$table_file' already exists. Do you want to overwrite it? (y/n): " overwrite_response
-            if [[ "$overwrite_response" != "y" ]]; then
-                echo "Aborting table creation."
-                continue
+            echo "Table file '$table_file' already exists."
+            echo "Aborting table creation."
+        # Ask the user if they want to view the contents of the existing table
+            read -r -p "Do you want to view the contents of this table? (y/n): " view_contents_response
+             # Check the user's response
+            if [ "$view_contents_response" = "y" ]; then
+                echo "Displaying contents of table '$table_name'..."
+                cat "$table_file"
+            else
+            continue   
             fi
+            continue
         fi
+
+
+                # Check if the table file already exists
+#         if [ -e "$table_file" ]; then
+#            read -r -p "Table file '$table_file' already exists. Do you want to overwrite it? (y/n): " overwrite_response
+#            if [[ "$overwrite_response" != "y" ]]; then
+#                echo "Aborting table creation."
+#                continue
+#            fi
+#        fi
+
 
         # Check if the table file already exists
         if [ -e "$table_name" ]; then
@@ -94,38 +112,65 @@ function create_table {
         # Inform the user that the table is created successfully
         echo "Table '$table_name' created successfully in the 'databases/$db_name' directory."
 
-        # Prompt the user to specify column names and data types
-        read -p "Please specify the column names and data types for the table (e.g., column_1_name:i, column_2_name:s, column_3_name:d): " column_data_input
 
-        # Convert user input to lowercase and remove spaces
-        column_data_input=$(echo "$column_data_input" | tr '[:upper:]' '[:lower:]' | tr -d ' ')
+        # ##############################################################################
 
-        # Split the input into an array
-        IFS=',' read -r -a columns_and_types <<< "$column_data_input"
 
-        # Store column names and data types in separate arrays
-        declare -a column_names
-        declare -a data_types
+        # Function to prompt the user for column names and data types
+        function prompt_column_data {
+            read -p "Please specify the column names and data types for the table (e.g., column_1_name:i, column_2_name:s, column_3_name:d): 
+            " column_data_input
 
-        for column_and_type in "${columns_and_types[@]}"; do
-            # Extract column name and data type from input
-            column_name=$(echo "$column_and_type" | cut -d ":" -f 1)
-            data_type=$(echo "$column_and_type" | cut -d ":" -f 2)
+            # Convert user input to lowercase and remove spaces
+            column_data_input=$(echo "$column_data_input" | tr '[:upper:]' '[:lower:]' | tr -d ' ')
 
-            # Validate data type shortcuts
-            case "$data_type" in
-                i) data_type="int" ;;
-                l) data_type="long" ;;
-                d) data_type="double" ;;
-                s) data_type="string" ;;
-                b) data_type="boolean" ;;
-                ![ildsb]) echo "Error: Invalid data type shortcut '$data_type'." ; exit 1 ;;
-            esac
+            # Split the input into an array
+            IFS=',' read -r -a columns_and_types <<< "$column_data_input"
 
-            # Add column name and data type to respective arrays
-            column_names+=("$column_name")
-            data_types+=("$data_type")
-        done
+            # Validate and store column names and data types
+            declare -a column_names
+            declare -a data_types
+
+            # Define an associative array to map data type shortcuts to full data type names
+            declare -A data_type_map
+            data_type_map["i"]="int"
+            data_type_map["l"]="long"
+            data_type_map["d"]="double"
+            data_type_map["s"]="string"
+            data_type_map["b"]="boolean"
+
+            for column_and_type in "${columns_and_types[@]}"; do
+                # Extract column name and data type from input
+                column_name=$(echo "$column_and_type" | cut -d ":" -f 1)
+                data_type_shortcut=$(echo "$column_and_type" | cut -d ":" -f 2)
+
+                # Map the data type shortcut to its full data type name
+                data_type="${data_type_map[$data_type_shortcut]}"
+
+                # Check if the data type is valid
+                if [ -z "$data_type" ]; then
+                    echo "Error: Invalid data type shortcut '$data_type_shortcut'."
+                    echo "Valid data type shortcuts: i (int), l (long), d (double), s (string), b (boolean)"
+                    exit 1
+                fi
+
+                # Add column name and data type to respective arrays
+                column_names+=("$column_name")
+                data_types+=("$data_type")
+            done
+
+            # Display the column names and their mapped data types to the user
+            echo "You've entered the following columns and their data types:"
+            for ((i = 0; i < ${#column_names[@]}; i++)); do
+                echo "$((i+1)): Column ${column_names[i]}: ${data_types[i]}"
+            done
+        }
+
+
+        # ##############################################################################
+
+# Call the prompt_column_data function
+prompt_column_data
 
         # Prompt for the primary key column
         echo "Please choose the primary key column from the list below:"
