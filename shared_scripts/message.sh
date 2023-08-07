@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 
 # ANSI escape codes for colors
 RED='\033[41m'
