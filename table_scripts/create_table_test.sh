@@ -91,6 +91,7 @@ function create_table {
         # Check if the directory is readable and writable
         if [ ! -r "databases/$db_name" ] || [ ! -w "databases/$db_name" ]; then
             echo "Warning: The 'databases/$db_name' directory doesn't have read/write permissions."
+
             # Prompt the user if they want to grant the needed permissions
             read -p "Do you want to grant the necessary permissions to the directory? (y/n): " permission_response
             if [[ "$permission_response" != "y" && "$permission_response" != "Y" ]]; then
@@ -139,24 +140,28 @@ function create_table {
             data_type_map["s"]="string"
             data_type_map["b"]="boolean"
 
+                        #Loop over each column and type input
             for column_and_type in "${columns_and_types[@]}"; do
-                # Extract column name and data type from input
-                column_name=$(echo "$column_and_type" | cut -d ":" -f 1)
-                data_type_shortcut=$(echo "$column_and_type" | cut -d ":" -f 2)
+                while true; do
+                    # Extract column name and data type from input
+                    column_name=$(echo "$column_and_type" | cut -d ":" -f 1)
+                    data_type_shortcut=$(echo "$column_and_type" | cut -d ":" -f 2)
 
-                # Map the data type shortcut to its full data type name
-                data_type="${data_type_map[$data_type_shortcut]}"
+                    # Map the data type shortcut to its full data type name
+                    data_type="${data_type_map[$data_type_shortcut]}"
 
-                # Check if the data type is valid
-                if [ -z "$data_type" ]; then
-                    echo "Error: Invalid data type shortcut '$data_type_shortcut'."
-                    echo "Valid data type shortcuts: i (int), l (long), d (double), s (string), b (boolean)"
-                    exit 1
-                fi
-
-                # Add column name and data type to respective arrays
-                column_names+=("$column_name")
-                data_types+=("$data_type")
+                    # Check if the data type is valid
+                    if [ -z "$data_type" ]; then
+                        echo "Error: Invalid data type shortcut '$data_type_shortcut'."
+                        echo "Valid data type shortcuts: i (int), l (long), d (double), s (string), b (boolean)"
+                        read -p "Please enter a valid data type shortcut: " data_type_shortcut
+                    else
+                        # Valid data type, add column name and data type to respective arrays
+                        column_names+=("$column_name")
+                        data_types+=("$data_type")
+                        break
+                    fi
+                done
             done
 
             # Display the column names and their mapped data types to the user
