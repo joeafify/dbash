@@ -33,4 +33,8 @@ do
         *) echo "Please enter a valid choice"
         ;;
     esac
+
+# Call the function to create a new table and pass the $db_name variable
+create_table "$db_name"
+
 done

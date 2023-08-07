@@ -7,6 +7,9 @@
 
 #!/bin/bash
 
+
+
+
 # Function to create a new table
 function create_table {
     while true; do
@@ -81,12 +84,19 @@ function create_table {
         # Convert the user's response to lowercase for case-insensitive comparison
         permission_response="${permission_response,,}"
 
+            # Check the user's response
+        if [ "$permission_response" = "y" ]; then
+            chmod +rw "databases/$db_name"
+            echo "Permissions granted to the 'databases/$db_name' directory."
+        else
+            echo "Warning: Without the necessary permissions, we cannot continue, returning to the table menu...."
+            exit 0
+        fi
 
         # Create the table file in the databases/$db_name directory
         touch "databases/$db_name/$table_name.txt"
 
-        # Set permissions for the directory (databases/$db_name) and the file (table_name.txt)
-        chmod 755 "databases/$db_name"
+        # Set permissions for the file (table_name.txt)
         chmod 644 "databases/$db_name/$table_name.txt"
 
         # Inform the user that the table is created successfully
@@ -94,24 +104,79 @@ function create_table {
 
         # Prompt the user to specify column names and data types
         echo "Please specify the column names and data types for the table."
-        # (You can use a loop to repeatedly ask for column names and data types)
-        # ...
 
-        # Prompt the user to specify the primary key column
-        read -r -p "Please specify the primary key column for the table: " primary_key_column
+        read -r -p "Please specify the column names and data types for the table (e.g., column_1_name:i, column_2_name:s, column_3_name:d): " column_data_input
 
-        # Check if the primary key column is empty
-        if [ -z "$primary_key_column" ]; then
-            echo "Error: You must specify a primary key column for the table. The table will not be created."
-            # Delete the table file as no primary key is provided
-            rm "databases/$db_name/$table_name.txt"
-        else
-            # Implementation of code to create the table here with the specified primary key
-            # ...
-            echo "Table '$table_name' with primary key '$primary_key_column' created successfully."
-        fi
+        # Convert user input to uppercase and remove spaces
+        column_data_input=$(echo "$column_data_input" | tr '[:upper:]' '[:lower:]' | tr -d ' ')
+
+        # Split the input into an array
+        IFS=',' read -r -a columns_and_types <<< "$column_data_input"
+
+        # Store column names and data types in separate arrays
+        declare -a column_names
+        declare -a data_types
+
+for column_and_type in "${columns_and_types[@]}"; do
+    # Extract column name and data type from input
+    column_name=$(echo "$column_and_type" | cut -d ":" -f 1)
+    data_type=$(echo "$column_and_type" | cut -d ":" -f 2)
+
+    # Validate data type shortcuts
+    case "$data_type" in
+        i) data_type="int" ;;
+        l) data_type="long" ;;
+        d) data_type="double" ;;
+        s) data_type="string" ;;
+        b) data_type="boolean" ;;
+        *) echo "Error: Invalid data type shortcut '$data_type'." ; exit 1 ;;
+    esac
+
+    # Add column name and data type to respective arrays
+    column_names+=("$column_name")
+    data_types+=("$data_type")
+done
+
+# Prompt for the primary key column
+echo "Please choose the primary key column from the list below:"
+for i in "${!column_names[@]}"; do
+    echo "$((i+1)): ${column_names[i]}"
+done
+
+while true; do
+    read -r -p "Enter the number or name of the primary key column (Type 'exit' to delete the table and return to the main menu): " primary_key_input
+
+    # Check if the user wants to exit and delete the table
+    if [ "$primary_key_input" = "exit" ]; then
+        echo "Deleting the table and returning to the main menu..."
+        # Remove the table file if it exists
+        rm -f "$table_file"
+        exit 0
+    fi
+
+    # Check if the input is a valid column number
+    if [[ $primary_key_input =~ ^[0-9]+$ && $primary_key_input -ge 1 && $primary_key_input -le ${#column_names[@]} ]]; then
+        # Subtract 1 from the input to get the index in the arrays
+        primary_key_index=$((primary_key_input-1))
+        break
+    elif [[ " ${column_names[@]} " =~ " $primary_key_input " ]]; then
+        # Check if the input is a valid column name
+        primary_key_index=$(echo "${column_names[@]}" | tr ' ' '\n' | grep -n "^$primary_key_input$" | cut -d ":" -f 1)
+        break
+    else
+        echo "Error: Invalid input. Please choose a valid column number or name."
+    fi
+
+
         break
     done
+
+    
+# Get the selected primary key column and data type
+primary_key_column=${column_names[primary_key_index]}
+primary_key_data_type=${data_types[primary_key_index]}
+
+
 }
 
 # Call the function to create a new table
