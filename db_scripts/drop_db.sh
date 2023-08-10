@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 
 # Function to drop an existing database
 function drop_database {
@@ -58,8 +58,7 @@ function drop_database {
                 read -p "Do you want to drop another database? (y/n): " continue_choice
                 case $continue_choice in
                     [Yy]) break ;;  # Continue to drop another database
-                    [Nn]) echo "Exiting drop_db.sh..."
-                          return ;;  # Exit drop_db.sh
+                    [Nn]) return ;;  # Exit drop_db.sh
                     *)    echo "Invalid choice. Please enter 'y' to continue or 'n' to exit."
                           ;;
                 esac

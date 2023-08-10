@@ -1,32 +1,26 @@
 #!/usr/bin/bash
-echo "\
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-~~~~~~~~~~    Welcome to 'DBash Database Manager'    ~~~~~~~~~
-~~~~~~~~~~~~~    Empowering Your Data Journey!    ~~~~~~~~~~~~
-~~~~~~~~~~~~~~~~~~~~     Developed by:     ~~~~~~~~~~~~~~~~~~~
-~~~~~  Mostafa Mohamed Eid    &   Youssef Mohamed Afify  ~~~~~
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-"
-
+echo "Welcome to 'DBash', Happy hacking!"
 PS3="What do you want? (For example [press 1]): "
 select choice in "Create new database" "List databases" "Connect to database" "Drop database" "Quit"
 do
-    case $choice in
-        "Create new database")
-            bash ./db_scripts/create_db.sh
+    if [[ $REPLY =~ ^[\\]$ ]]
+    then
+        echo "Invalid choice. '\\' is not allowed."
+    fi
+    case $REPLY in
+        1)
+            create_db.sh
         ;;
-        "List databases")
-            bash ./db_scripts/list_dbs.sh
+        2)
+            list_dbs.sh
         ;;
-        "Connect to database")
-            bash ./db_scripts/connect_to_db.sh
+        3)
+            connect_to_db.sh
         ;;
-        "Drop database")
-            bash ./db_scripts/drop_db.sh
+        4)
+            drop_db.sh
         ;;
-        "Quit")
+        5)
             echo "Bye!"
             exit
         ;;
