@@ -1,5 +1,15 @@
 #!/usr/bin/bash
-echo "Welcome to 'DBash', Happy hacking!"
+echo "\
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~    Welcome to 'DBash Database Manager'    ~~~~~~~~~
+~~~~~~~~~~~~~    Empowering Your Data Journey!    ~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~     Developed by:     ~~~~~~~~~~~~~~~~~~~
+~~~~~  Mostafa Mohamed Eid    &   Youssef Mohamed Afify  ~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+"
+
 PS3="What do you want? (For example [press 1]): "
 select choice in "Create new database" "List databases" "Connect to database" "Drop database" "Quit"
 do
@@ -28,7 +38,5 @@ do
         ;;
     esac
 
-# Call the function to create a new table and pass the $db_name variable
-create_table "$db_name"
 
 done
