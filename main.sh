@@ -9,7 +9,7 @@ echo "\
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 "
-
+export PATH=$PATH:$(pwd):$(pwd)/shared_scripts/:$(pwd)/table_scripts/:$(pwd)/db_scripts/
 PS3="What do you want? (For example [press 1]): "
 select choice in "Create new database" "List databases" "Connect to database" "Drop database" "Quit"
 do
