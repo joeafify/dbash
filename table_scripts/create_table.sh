@@ -6,6 +6,8 @@
 # The script will perform necessary validations to ensure the table is created correctly.
 # The script will perform necessary validations to ensure the database has encessary permissions. 
 
+db_name=$(basename "$(pwd)")
+
 # Function to create a new table
 function create_table {
     while true; do
@@ -23,8 +25,12 @@ function create_table {
             continue
         fi
 
+
+
+
+#************************************************/////////////////////////*********************************
         # File path for the table
-        table_file= $table_name
+        table_file= "$table_name".txt
 
         # Check if the table file already exists
         if [ -e "$table_file" ]; then
@@ -32,7 +38,7 @@ function create_table {
             echo "Aborting table creation."
         # Ask the user if they want to view the contents of the existing table
             read -r -p "Do you want to view the contents of this table? (y/n): " view_contents_response
-             # Check the user's response
+        # Check the user's response
             if [ "$view_contents_response" = "y" ]; then
                 echo "Displaying contents of table '$table_name'..."
                 cat "$table_file"
@@ -86,16 +92,16 @@ function create_table {
         fi
 
         # Check if the directory is readable and writable
-        if [ ! -r "databases/$db_name" ] || [ ! -w "databases/$db_name" ]; then
-            echo "Warning: The 'databases/$db_name' directory doesn't have read/write permissions."
+        if [ ! -r "$db_name" ] || [ ! -w "$db_name" ]; then
+            echo "Warning: The '$db_name' database  doesn't have read/write permissions."
             # Prompt the user if they want to grant the needed permissions
-            read -p "Do you want to grant the necessary permissions to the directory? (y/n): " permission_response
+            read -p "Do you want to grant the necessary permissions to the database? (y/n): " permission_response
             if [[ "$permission_response" != "y" && "$permission_response" != "Y" ]]; then
                 echo "Warning: Without the necessary permissions, we cannot continue. Returning to the tables menu..."
                 exit 0
             else
-                chmod +rw "databases/$db_name"
-                echo "Permissions granted to the 'databases/$db_name' directory."
+                chmod +rw "$db_name"
+                echo "Permissions granted to the '$db_name' database."
             fi
         fi
 
@@ -206,42 +212,40 @@ echo "Success: Primary key selected for column ${column_names[primary_key_index]
 primary_key_column=${column_names[primary_key_index]}
 primary_key_data_type=${data_types[primary_key_index]}
 
+#*****************************///////////////////**************************************************
 
-echo 
-echo 
-echo
-
-
-
-
-
+echo pwd
+echo $column_names
+echo $primary_key_input
+echo $primary_key_index
+echo $data_types
 
 
+db_name=$(basename "$(pwd)")
 
-
-
-
-
-# Create the table file in the databases/$db_name directory
-        touch "databases/$db_name/$table_name.txt"
+# Create the table file in the $db_name directory
+        touch "$table_name.txt"
 
         #create the metadata file
-        touch "databases/$db_name/.$(echo "$table_name" | tr -d ' ' )_md.txt" 2>&1
+        touch ".$(echo "$table_name" | tr -d ' ' )_md.txt" 2>&1
         if [ $? -ne 0 ]; then
             echo "Error creating metadata file: $?"
         fi
 
         # Set permissions for the file (table_name.txt) and metadata file
-        chmod 644 "databases/$db_name/$table_name.txt"
-        chmod 644 "databases/$db_name/.$(echo "$table_name" | tr -d ' ' )_md.txt"
+        sudo chmod 644 "$table_name.txt"
+        sudo chmod 644 ".$(echo "$table_name" | tr -d ' ' )_md.txt"
 
         # Inform the user that the table is created successfully
-        echo "Table '$table_name' created successfully in the 'databases/$db_name' directory."
-
-
+        echo "Table '$table_name' created successfully in the '$db_name' directory."
 
         break
     done
+
+        echo "#column_names" > table_name.txt
+        echo "$data_types" > "("$table_name" | tr -d ' ' )_md.txt"
+        echo "$data_types" > "("$table_name" | tr -d ' ' )_md.txt"
+
 
 }
 

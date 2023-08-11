@@ -10,7 +10,9 @@ echo "\
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 "
 export PATH=$PATH:$(pwd):$(pwd)/shared_scripts/:$(pwd)/table_scripts/:$(pwd)/db_scripts/
-PS3="What do you want? (For example [press 1]): "
+PS3="What do you want?
+(For example [press 1])
+(To list options again [press Enter]): "
 select choice in "Create new database" "List databases" "Connect to database" "Drop database" "Quit"
 do
     if [[ $REPLY =~ ^[\\]$ ]]

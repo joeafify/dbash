@@ -5,7 +5,7 @@ select choice in "Create new table" "List tables" "Drop table" "Insert into tabl
 do
     case $REPLY in
         1)
-            exit
+            create_table.sh
         ;;
         2)
             list_tables.sh
