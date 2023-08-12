@@ -20,7 +20,7 @@ do
             exit
         ;;
         6)
-            exit
+            delete_form_table.sh
         ;;
         7)
             exit

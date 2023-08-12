@@ -16,8 +16,8 @@ if [ ! -f "$metadata_file" ]; then
     exit 1
 fi
 
-IFS=',' read -r -a headers < "$metadata_file"
-IFS=',' read -r -a types < "$metadata_file" | sed -n '2p'
+IFS=',' read -r -a headers < "$table_file"
+IFS=',' read -r -a types < <(sed -n '1p' "$metadata_file")  # Read only the first line
 pk_column=$(tail -n 1 "$metadata_file" | sed 's/pk=//')
 
 declare -A data_map
@@ -31,6 +31,7 @@ for ((i = 0; i < ${#headers[@]}; i++)); do
 
     while true; do
         read -p "Enter value for '$header' ($data_type): " value
+        echo "Debug: data_type = $data_type, value = $value"  # Debug statement
 
         # Validate value based on data type
         case "$data_type" in
