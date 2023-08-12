@@ -201,14 +201,7 @@ function create_table {
 
     echo "Error: Invalid input. Please choose a valid column number or name."
 done
-
 echo "Success: Primary key selected for column ${column_names[primary_key_index]}"
-
-#******************************************************
-echo ${column_names[@]}
-echo ${data_types[@]}
-echo `pwd`
-echo $(ls -l)
 
 # Create the table file in the $db_name directory
         touch $table_name
@@ -229,8 +222,8 @@ echo $(ls -l)
         break
     done
 
-        echo "${column_names[@]}" > $table_name
-        echo "${data_types[@]}" > .${table_name}_md
+        echo "${column_names[*]}" | tr ' ' ',' > "$table_name"
+        echo "${data_types[*]}" | tr ' ' ',' > ".$table_name"_md
         echo "pk=$((primary_key_index+1))" >> .${table_name}_md
 
 }
