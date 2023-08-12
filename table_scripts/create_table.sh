@@ -6,8 +6,6 @@
 # The script will perform necessary validations to ensure the table is created correctly.
 # The script will perform necessary validations to ensure the database has encessary permissions. 
 
-
-
 # Function to create a new table
 function create_table {
     while true; do

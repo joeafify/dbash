@@ -7,7 +7,18 @@
 
 # Function to drop a table
 function drop_table {
+    # Get the list of tables in the current database
+    available_tables=$(ls | grep -E '^[^.]+$')
+    
+    # Check if there are tables available to drop
+    if [ -z "$available_tables" ]; then
+        echo "There are no tables in the database to drop."
+        return
+    fi
+
     while true; do
+        echo "Available tables in the database: 
+$available_tables"
         read -r -p "Enter the name of the table to drop (Type 'exit' to return to the tables menu): " table_name
 
         # Check if the user wants to exit the program
@@ -22,11 +33,8 @@ function drop_table {
             continue
         fi
 
-        # File path for the table
-        table_file="databases/$db_name/$table_name.txt"
-
-        # Check if the table file exists
-        if [ ! -e "$table_file" ]; then
+        # Check if the table exists
+        if ! [[ $available_tables =~ (^|[[:space:]])$table_name($|[[:space:]]) ]]; then
             echo "Error: Table '$table_name' does not exist in the database."
             continue
         fi
@@ -39,12 +47,10 @@ function drop_table {
         fi
 
         # Remove the table file
-        rm -f "$table_file"
+        rm -f $table_name
 
         # Remove the metadata file
-        metadata_file="databases/$db_name/.$(echo "$table_name" | tr -d ' ' )_md.txt"
-        rm -f "$metadata_file"
-
+        rm -f ".$table_name"_md
         echo "Table '$table_name' has been dropped from the database."
         break
     done

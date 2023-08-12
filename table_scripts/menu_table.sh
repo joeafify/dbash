@@ -11,7 +11,7 @@ do
             list_tables.sh
         ;;
         3)
-            exit
+            drop_table.sh
         ;;
         4)
             exit
