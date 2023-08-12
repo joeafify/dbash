@@ -36,7 +36,6 @@ existing_pk_values=($(cut -d ',' -f $pk_column "$data_file"))
 
         while true; do
             read -p "Enter value for '$header' ($data_type): " value
-            echo "Debug: data_type = $data_type, value = $value"  # Debug statement
 
             # Validate value based on data type
             case "$data_type" in
@@ -67,7 +66,7 @@ existing_pk_values=($(cut -d ',' -f $pk_column "$data_file"))
                     ;;
             esac
         done
-
+#**********************************************************************************
         # Validate primary key uniqueness
         if [ "$i" -eq "$pk_column" ]; then
             if [[ " ${existing_pk_values[@]} " =~ " ${value} " ]]; then
@@ -85,7 +84,7 @@ existing_pk_values=($(cut -d ',' -f $pk_column "$data_file"))
         new_row+=","
     done
     new_row=${new_row::-1}
-
+#**********************************************************************************
 # Validate primary key uniqueness and non-empty values
 if [ "$i" -eq "$pk_column" ]; then
     if [[ " ${existing_pk_values[@]} " =~ " ${value} " ]]; then
