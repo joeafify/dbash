@@ -6,7 +6,7 @@
 # The script will perform necessary validations to ensure the table is created correctly.
 # The script will perform necessary validations to ensure the database has encessary permissions. 
 
-db_name=$(basename "$(pwd)")
+
 
 # Function to create a new table
 function create_table {
@@ -25,23 +25,16 @@ function create_table {
             continue
         fi
 
-
-
-
-#************************************************/////////////////////////*********************************
-        # File path for the table
-        table_file= "$table_name".txt
-
         # Check if the table file already exists
-        if [ -e "$table_file" ]; then
-            echo "Table file '$table_file' already exists."
+        if [ -e "$table_name" ]; then
+            echo "Table file '$table_name' already exists."
             echo "Aborting table creation."
         # Ask the user if they want to view the contents of the existing table
             read -r -p "Do you want to view the contents of this table? (y/n): " view_contents_response
         # Check the user's response
             if [ "$view_contents_response" = "y" ]; then
                 echo "Displaying contents of table '$table_name'..."
-                cat "$table_file"
+                cat "$table_name"
             else
             continue   
             fi
@@ -50,8 +43,8 @@ function create_table {
 
 
                 # Check if the table file already exists and ask to overwrite
-#         if [ -e "$table_file" ]; then
-#            read -r -p "Table file '$table_file' already exists. Do you want to overwrite it? (y/n): " overwrite_response
+#         if [ -e "$table_name" ]; then
+#            read -r -p "Table file '$table_name' already exists. Do you want to overwrite it? (y/n): " overwrite_response
 #            if [[ "$overwrite_response" != "y" ]]; then
 #                echo "Aborting table creation."
 #                continue
@@ -91,19 +84,22 @@ function create_table {
             continue
         fi
 
-        # Check if the directory is readable and writable
-        if [ ! -r "$db_name" ] || [ ! -w "$db_name" ]; then
-            echo "Warning: The '$db_name' database  doesn't have read/write permissions."
-            # Prompt the user if they want to grant the needed permissions
-            read -p "Do you want to grant the necessary permissions to the database? (y/n): " permission_response
-            if [[ "$permission_response" != "y" && "$permission_response" != "Y" ]]; then
-                echo "Warning: Without the necessary permissions, we cannot continue. Returning to the tables menu..."
-                exit 0
-            else
-                chmod +rw "$db_name"
-                echo "Permissions granted to the '$db_name' database."
-            fi
-        fi
+
+        chmod +w $(pwd)
+
+        # Check if the directory is  writable
+#        if [ ! -w "$db_name" ]; then
+#            echo "Warning: The '$db_name' database doesn't have write permissions."
+#            # Prompt the user if they want to grant the needed permissions
+#            read -p "Do you want to grant the necessary permission to the database? (y/n): " permission_response
+#            if [[ "$permission_response" != "y" && "$permission_response" != "Y" ]]; then
+#                echo "Warning: Without the necessary permissions, we cannot continue. Returning to the tables menu..."
+#                exit 0
+#            else
+#                chmod +w "$db_name"
+#                echo "Permissions granted to the '$db_name' database."
+#            fi
+#        fi
 
             # Validate and store column names and data types
             declare -a column_names
@@ -162,23 +158,23 @@ function create_table {
             done
         }
 
-# Call the prompt_column_data function
-prompt_column_data
+        # Call the prompt_column_data function
+        prompt_column_data
 
 
-       # Prompt for the primary key column
-echo "Please choose the primary key column from the list above:"
+            # Prompt for the primary key column
+        echo "Please choose the primary key column from the list above:"
 
-while true; do
-    read -r -p "Enter the number or name of the primary key column (Type 'exit' to delete the table and return to the main menu): " primary_key_input
+        while true; do
+            read -r -p "Enter the number or name of the primary key column (Type 'exit' to delete the table and return to the main menu): " primary_key_input
 
-    # Check if the user wants to exit and delete the table
-    if [ "$primary_key_input" = "exit" ]; then
-        echo "Deleting the table and returning to the main menu..."
-        # Remove the table file if it exists
-        rm -f "$table_file"
-        exit 0
-    fi
+            # Check if the user wants to exit and delete the table
+            if [ "$primary_key_input" = "exit" ]; then
+                echo "Deleting the table and returning to the main menu..."
+                # Remove the table file if it exists
+                rm -f "$table_name"
+                exit 0
+            fi
 
     # Check if the input is a valid column number
     if [[ $primary_key_input =~ ^[0-9]+$ ]]; then
@@ -208,63 +204,37 @@ done
 
 echo "Success: Primary key selected for column ${column_names[primary_key_index]}"
 
-# Get the selected primary key column and data type
-primary_key_column=${column_names[primary_key_index]}
-primary_key_data_type=${data_types[primary_key_index]}
-
-#*****************************///////////////////**************************************************
-
-echo pwd
-echo $column_names
-echo $primary_key_input
-echo $primary_key_index
-echo $data_types
-
-
-db_name=$(basename "$(pwd)")
+#******************************************************
+echo ${column_names[@]}
+echo ${data_types[@]}
+echo `pwd`
+echo $(ls -l)
 
 # Create the table file in the $db_name directory
-        touch "$table_name.txt"
+        touch $table_name
+        mkdir 123
 
         #create the metadata file
-        touch ".$(echo "$table_name" | tr -d ' ' )_md.txt" 2>&1
+        touch .${table_name}_md 2>&1
         if [ $? -ne 0 ]; then
             echo "Error creating metadata file: $?"
         fi
 
-        # Set permissions for the file (table_name.txt) and metadata file
-        sudo chmod 644 "$table_name.txt"
-        sudo chmod 644 ".$(echo "$table_name" | tr -d ' ' )_md.txt"
+        # Set permissions for the file (table_name) and metadata file
+        sudo chmod 644 $table_name
+        sudo chmod 644 .${table_name}_md
 
         # Inform the user that the table is created successfully
-        echo "Table '$table_name' created successfully in the '$db_name' directory."
+        echo "Table '$table_name' created successfully"
 
         break
     done
 
-        echo "#column_names" > table_name.txt
-        echo "$data_types" > "("$table_name" | tr -d ' ' )_md.txt"
-        echo "$data_types" > "("$table_name" | tr -d ' ' )_md.txt"
-
+        echo "${column_names[@]}" > $table_name
+        echo "${data_types[@]}" > .${table_name}_md
+        echo "pk=$((primary_key_index+1))" >> .${table_name}_md
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 # Call the function to create a new table
 create_table
