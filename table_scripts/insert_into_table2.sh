@@ -1,17 +1,15 @@
 #!/bin/bash
 
 echo "Insert New Row into Table...."
-read -p "Enter the table name you want to insert into: " tableName
+read -p "Enter the table name you want to insert into: " table_name
+table_file="$table_name"
+metadata_file=".${table_name}_md"
+data_file="$table_name"
 
-table_file="${tableName}.txt"
-
-if [ ! -f "databases/$mydb/$table_file" ]; then
-    echo "Table '$table_file' does not exist in database '$mydb'."
+if [ ! -f "$data_file" ]; then
+    echo "Table '$table_file' does not exist."
     exit 1
 fi
-
-metadata_file="databases/$mydb/.${tableName}_md.txt"
-data_file="databases/$mydb/$table_file"
 
 if [ ! -f "$metadata_file" ]; then
     echo "Metadata file '$metadata_file' does not exist."
@@ -20,17 +18,21 @@ fi
 
 IFS=',' read -r -a headers < "$metadata_file"
 IFS=',' read -r -a types < "$metadata_file" | sed -n '2p'
+pk_column=$(tail -n 1 "$metadata_file" | sed 's/pk=//')
 
 declare -A data_map
 
-for i in "${!headers[@]}"; do
+# Load existing primary key values
+existing_pk_values=($(cut -d ',' -f $pk_column "$data_file"))
+
+for ((i = 0; i < ${#headers[@]}; i++)); do
     header="${headers[i]}"
     data_type="${types[i]}"
-    
+
     while true; do
         read -p "Enter value for '$header' ($data_type): " value
-        
-        # Data type validation
+
+        # Validate value based on data type
         case "$data_type" in
             i)  # Integer
                 if [[ "$value" =~ ^[0-9]+$ ]]; then
@@ -59,7 +61,15 @@ for i in "${!headers[@]}"; do
                 ;;
         esac
     done
-    
+
+    # Validate primary key uniqueness
+    if [ "$i" -eq "$pk_column" ]; then
+        if [[ " ${existing_pk_values[@]} " =~ " ${value} " ]]; then
+            echo "Primary key value already exists. Please enter a unique value."
+            exit 1
+        fi
+    fi
+
     data_map["$header"]="$value"
 done
 
@@ -71,5 +81,4 @@ done
 new_row=${new_row::-1}
 
 echo "$new_row" >> "$data_file"
-
 echo "New row inserted into $table_file."

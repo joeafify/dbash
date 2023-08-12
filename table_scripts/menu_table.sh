@@ -14,7 +14,7 @@ do
             drop_table.sh
         ;;
         4)
-            exit
+            insert_into_table2.sh
         ;;
         5)
             exit
