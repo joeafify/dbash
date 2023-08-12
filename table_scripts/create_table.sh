@@ -212,7 +212,6 @@ echo $(ls -l)
 
 # Create the table file in the $db_name directory
         touch $table_name
-        mkdir 123
 
         #create the metadata file
         touch .${table_name}_md 2>&1
