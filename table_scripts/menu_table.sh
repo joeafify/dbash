@@ -17,7 +17,7 @@ do
             exit
         ;;
         5)
-            exit
+            select_table.sh
         ;;
         6)
             exit
