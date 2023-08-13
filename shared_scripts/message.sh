@@ -25,7 +25,7 @@ then
 elif [[ $2 == '' ]]
 then
     echo -e "${BG_BLUE}${message}${RESET}"
-if [[ $2 == 'red' ]]
+elif [[ $2 == 'red' ]]
 then
     echo -e "${FG_RED}${message}${RESET}"
 elif [[ $2 == 'green' ]]
@@ -38,4 +38,3 @@ elif [[ $2 == 'blue' ]]
 then
     echo -e "${FG_BLUE}${message}${RESET}"    
 fi
-
