@@ -211,8 +211,8 @@ echo "Success: Primary key selected for column ${column_names[primary_key_index]
         fi
 
         # Set permissions for the file (table_name) and metadata file
-        sudo chmod 644 $table_name
-        sudo chmod 644 .${table_name}_md
+        chmod 644 $table_name
+        chmod 644 .${table_name}_md
 
         # Inform the user that the table is created successfully
         echo "Table '$table_name' created successfully"

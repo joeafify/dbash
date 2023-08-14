@@ -1,8 +1,7 @@
 #!/bin/bash
 
-while true; do
-    echo "Insert New Row into Table...."
-    read -p "Enter the table name you want to insert into: " table_name
+echo "Insert New Row into Table...."
+    read -r -p "Enter the table name you want to insert into: " table_name
     table_file="$table_name"
     metadata_file=".${table_name}_md"
     data_file="$table_name"
@@ -17,40 +16,46 @@ while true; do
         exit 1
     fi
 
-    IFS=',' read -r -a headers < "$table_file"
-    IFS=',' read -r -a types < <(sed -n '1p' "$metadata_file")  # Read only the first line
-    pk_column=$(tail -n 1 "$metadata_file" | sed 's/pk=//')
+        IFS=',' read -r -a headers < "$table_file"
+        IFS=',' read -r -a types < <(sed -n '1p' "$metadata_file")  # Read only the first line
+        pk_column=$(tail -n 1 "$metadata_file" | sed 's/pk=//')
 
-    declare -A data_map
+        declare -A data_map
 
 
-# Load existing primary key values
-existing_pk_values=($(cut -d ',' -f $pk_column "$data_file"))
+        # Load existing primary key values
+        existing_pk_values=($(cut -d ',' -f $pk_column "$data_file"))
 
-    # Load existing primary key values
-    existing_pk_values=($(cut -d ',' -f $pk_column "$data_file"))
+        # Load existing primary key values
+        existing_pk_values=($(cut -d ',' -f $pk_column "$data_file"))
+
+
+while true; do
 
     for ((i = 0; i < ${#headers[@]}; i++)); do
         header="${headers[i]}"
         data_type="${types[i]}"
 
         while true; do
-            read -p "Enter value for '$header' ($data_type): " value
+            read -r -p "Enter value for '$header' ($data_type): " value
 
             # Validate value based on data type
             case "$data_type" in
                 int)  # Integer
-                    if [[ "$value" =~ ^[0-9]+$ ]]; then
+                    if [[ "$value" =~ ^[1-9][0-9]+$ || "$value" =~ ^[0-9]$ ]]; then
+
                         break
                     else
-                        echo "Invalid input. Please enter an integer value."
+                        echo "Invalid input. Please enter an integer value.
+and you can not start the number with 0 but you can set it to just 0"
                     fi
                     ;;
                 float)  # Float
-                    if [[ "$value" =~ ^[0-9]*\.?[0-9]+$ ]]; then
+                    if [[ "$value" =~ ^[1-9][0-9]*\.?[0-9]+$ || "$value" =~ ^[0-9]\.[0-9]+$ ]]; then
                         break
                     else
-                        echo "Invalid input. Please enter a valid numeric value."
+                        echo "Invalid input. Please enter a valid numeric value.
+you can not input many "0" in the beginning of the number"
                     fi
                     ;;
                 string)  # String
@@ -66,14 +71,7 @@ existing_pk_values=($(cut -d ',' -f $pk_column "$data_file"))
                     ;;
             esac
         done
-#**********************************************************************************
-        # Validate primary key uniqueness
-        if [ "$i" -eq "$pk_column" ]; then
-            if [[ " ${existing_pk_values[@]} " =~ " ${value} " ]]; then
-                echo "Primary key value already exists. Please enter a unique value."
-                exit 1
-            fi
-        fi
+
 
         data_map["$header"]="$value"
     done
@@ -84,7 +82,8 @@ existing_pk_values=($(cut -d ',' -f $pk_column "$data_file"))
         new_row+=","
     done
     new_row=${new_row::-1}
-#**********************************************************************************
+
+
 # Validate primary key uniqueness and non-empty values
 if [ "$i" -eq "$pk_column" ]; then
     if [[ " ${existing_pk_values[@]} " =~ " ${value} " ]]; then
@@ -96,12 +95,12 @@ if [ "$i" -eq "$pk_column" ]; then
     fi
 fi
 
-
+    echo "$new_row"
     echo "$new_row" >> "$data_file"
     echo "New row inserted into $table_file."
 
     # Prompt to add another row
-    read -p "Do you want to add another row? (y/n): " add_another
+    read -r -p "Do you want to add another row? (y/n): " add_another
     if [ "$add_another" != "y" ]; then
         echo "Exiting..."
         break
