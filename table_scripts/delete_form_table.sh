@@ -35,7 +35,7 @@ function delete_from_table {
         done
 
         # Prompt for primary key column
-        read -p "Enter the number of the primary key column to filter by: " pk_column_num
+        read -p "Enter the number of the primary key column to filter by (or any other column): " pk_column_num
         if [[ "$pk_column_num" =~ ^[0-9]+$ ]] && [ "$pk_column_num" -ge 1 ] && [ "$pk_column_num" -le ${#headers[@]} ]; then
             pk_column_num=$((pk_column_num-1))
             pk_column_header="${headers[pk_column_num]}"
@@ -49,19 +49,19 @@ function delete_from_table {
 
         # Validate value based on primary key data type
         case "${types[pk_column_num]}" in
-            i)  # Integer
+            int)  # Integer
                 if ! [[ "$pk_value" =~ ^[0-9]+$ ]]; then
                     echo "Invalid input. Please enter an integer value."
                     continue
                 fi
                 ;;
-            f)  # Float
+            float)  # Float
                 if ! [[ "$pk_value" =~ ^[0-9]*\.?[0-9]+$ ]]; then
                     echo "Invalid input. Please enter a float value."
                     continue
                 fi
                 ;;
-            s)  # String
+            string)  # String
                 if [ -z "$pk_value" ]; then
                     echo "Invalid input. Please enter a non-empty string."
                     continue
