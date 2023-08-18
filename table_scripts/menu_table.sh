@@ -23,7 +23,7 @@ do
             exit
         ;;
         7)
-            exit
+            update_table.sh
         ;;
         8)
             exit
