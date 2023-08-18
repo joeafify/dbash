@@ -5,22 +5,22 @@ select choice in "Create new table" "List tables" "Drop table" "Insert into tabl
 do
     case $REPLY in
         1)
-            exit
+            create_table.sh
         ;;
         2)
             list_tables.sh
         ;;
         3)
-            exit
+            drop_table.sh
         ;;
         4)
-            exit
+            insert_into_table2.sh
         ;;
         5)
             select_table.sh
         ;;
         6)
-            exit
+            delete_form_table.sh
         ;;
         7)
             update_table.sh
