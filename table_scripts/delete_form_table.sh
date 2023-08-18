@@ -1,86 +1,64 @@
 #!/bin/bash
 
-# Delete From Table Script
-# This script allows you to delete rows from an existing table in the current database.
-# You will be prompted to provide the name of the table and conditions for deleting rows.
-# The script will perform necessary validations before deleting the rows.
-
-# Function to delete rows from a table
-function delete_from_table {
-    while true; do
-        echo "Delete Rows from Table..."
-        read -p "Enter the name of the table you want to delete rows from: " table_name
-        table_file="$table_name"
-        metadata_file=".${table_name}_md"
-        data_file="$table_name"
-
-        if [ ! -f "$data_file" ]; then
-            echo "Table '$table_file' does not exist."
-            return
-        fi
-
-        if [ ! -f "$metadata_file" ]; then
-            echo "Metadata file '$metadata_file' does not exist."
-            return
-        fi
-
-        IFS=',' read -r -a headers < "$table_file"
-        IFS=',' read -r -a types < <(sed -n '1p' "$metadata_file")  # Read only the first line
-        pk_column=$(tail -n 1 "$metadata_file" | sed 's/pk=//')
-
-        # Display available columns for user's reference
-        echo "Available columns in '$table_name':"
-        for ((i = 0; i < ${#headers[@]}; i++)); do
-            echo "$((i+1)): ${headers[i]} (${types[i]})"
-        done
-
-        # Prompt for primary key column
-        read -p "Enter the number of the primary key column to filter by (or any other column): " pk_column_num
-        if [[ "$pk_column_num" =~ ^[0-9]+$ ]] && [ "$pk_column_num" -ge 1 ] && [ "$pk_column_num" -le ${#headers[@]} ]; then
-            pk_column_num=$((pk_column_num-1))
-            pk_column_header="${headers[pk_column_num]}"
-        else
-            echo "Invalid input for primary key column number."
-            continue
-        fi
-
-        # Prompt for value of primary key to filter by
-        read -p "Enter the value of '$pk_column_header' to filter rows: " pk_value
-
-        # Validate value based on primary key data type
-        case "${types[pk_column_num]}" in
-            int)  # Integer
-                if ! [[ "$pk_value" =~ ^[0-9]+$ ]]; then
-                    echo "Invalid input. Please enter an integer value."
-                    continue
-                fi
-                ;;
-            float)  # Float
-                if ! [[ "$pk_value" =~ ^[0-9]*\.?[0-9]+$ ]]; then
-                    echo "Invalid input. Please enter a float value."
-                    continue
-                fi
-                ;;
-            string)  # String
-                if [ -z "$pk_value" ]; then
-                    echo "Invalid input. Please enter a non-empty string."
-                    continue
-                fi
-                ;;
-            *)
-                echo "Invalid data type found in metadata."
-                return
-                ;;
-        esac
-
-        # Perform deletion based on primary key condition
-        grep -v "^$pk_value," "$data_file" > "${data_file}_temp"
-        mv "${data_file}_temp" "$data_file"
-
-        echo "Rows with '$pk_column_header' = '$pk_value' have been deleted from '$table_name'."
-        break
-    done
+select_table_name(){
+    read -r -p "Select table name: " table_name
+    if [ ! -f ${table_name} ]; then
+        message.sh "Table does not exist" "error"
+        select_table_name
+    fi
 }
 
-# Call the function to delete rows from a table
-delete_from_table
+get_condition_column(){
+    message.sh "Select your prefered condition:\n" "blue"
+    while true
+    do
+        read -r -p "Enter column name: " column_name
+        if [ -z column_name ]
+        then
+            continue
+        else
+            break
+        fi
+    done
+    while true
+    do
+        read -r -p "Enter value for '${column_name}': " column_value
+        if [ -z column_value ]
+        then
+            continue
+        else
+            break
+        fi
+    done
+}
+select_table_name
+get_condition_column
+
+read -r metadata_line < "$table_name"
+IFS=',' read -ra metadata_columns <<< "$metadata_line"
+
+condition_col_num=0
+for i in "${!metadata_columns[@]}"; do
+    if [ "${metadata_columns[i]}" = "$column_name" ]; then
+        condition_col_num=$((i + 1))
+        break
+    fi
+done
+
+if [ "$condition_col_num" -eq 0 ]; then
+    message.sh "Condition column  '$column_name' not found" "error"
+fi
+
+temp_file=$(mktemp)
+count=0
+while IFS= read -r data_line; do
+    IFS=',' read -ra data_values <<< "$data_line"
+    if [ ! "${data_values[condition_col_num - 1]}" = "$column_value" ]; then
+        echo $(IFS=','; echo "${data_values[*]}") >> "${temp_file}"
+    else
+        count=$((count+1))
+    fi
+
+done < "${table_name}"
+mv "${temp_file}" "${table_name}"
+message.sh "(${count}) rows deleted" "success"
