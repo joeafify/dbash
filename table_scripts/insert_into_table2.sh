@@ -28,7 +28,6 @@ echo "Insert New Row into Table...."
         # Load existing primary key values
         existing_pk_values=($(cut -d ',' -f $pk_column "$data_file"))
 
-
 while true; do
 
     for ((i = 0; i < ${#headers[@]}; i++)); do
