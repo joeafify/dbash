@@ -55,11 +55,11 @@ function create_table {
 #        fi
 
 
-        # Check if the table file already exists
-        if [ -e "$table_name" ]; then
-            echo "Error: Table '$table_name' already exists."
-            continue
-        fi
+ #       # Check if the table file already exists
+ #       if [ -e "$table_name" ]; then
+ #           echo "Error: Table '$table_name' already exists."
+ #           continue
+ #       fi
 
         # Check if the user wants to exit the program
         if [ "$table_name" = "exit" ]; then
@@ -86,7 +86,6 @@ function create_table {
             echo "Name cannot be just numbers, hyphens -, or underscores _."
             continue
         fi
-
 
         chmod +w $(pwd)
 
@@ -129,7 +128,7 @@ function create_table {
 
         for column_and_type in "${columns_and_types[@]}"; do
             # Extract column name and data type from input
-            column_name=$(echo "$column_and_type" | cut -d ":" -f 1)
+            column_name=$(echo "$column_and_type" | cut -d ":" -f 1`)
             data_type_shortcut=$(echo "$column_and_type" | cut -d ":" -f 2)
 
             # Map the data type shortcut to its full data type name
@@ -154,12 +153,12 @@ function create_table {
         fi
     done
 
-            # Display the column names and their mapped data types to the user
-            echo "You've entered the following columns and their data types:"
-            for ((i = 0; i < ${#column_names[@]}; i++)); do
-                echo "$((i+1)): Column ${column_names[i]}: ${data_types[i]}"
-            done
-        }
+        # Display the column names and their mapped data types to the user
+        echo "You've entered the following columns and their data types:"
+        for ((i = 0; i < ${#column_names[@]}; i++)); do
+            echo "$((i+1)): Column ${column_names[i]}: ${data_types[i]}"
+        done
+    }
 
         # Call the prompt_column_data function
         prompt_column_data

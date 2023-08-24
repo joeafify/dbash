@@ -19,6 +19,12 @@ function create_database {
         (Type 'exit' to return to main menu)
         New database name: " db_name
 
+        if [[ "$db_name" =~ ^[^A-Za-z0-9_].*$ ]]; then
+            echo "Error: Database name cannot start with a special character."
+            continue
+        fi
+
+
         # Check if the database name is empty
         if [ -z "$db_name" ]; then
             echo "Error: Database name cannot be empty."
