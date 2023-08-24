@@ -22,13 +22,11 @@ echo "Insert New Row into Table...."
 
         declare -A data_map
 
-
         # Load existing primary key values
         existing_pk_values=($(cut -d ',' -f $pk_column "$data_file"))
 
         # Load existing primary key values
         existing_pk_values=($(cut -d ',' -f $pk_column "$data_file"))
-
 
 while true; do
 

@@ -17,6 +17,11 @@ function create_table {
         (Type 'exit' to return to the tables menu)
         New table name: " table_name
 
+        if [[ "$table_name" =~ ^[^A-Za-z0-9_].*$ ]]; then
+            echo "Error: Table name cannot start with a special character."
+            continue
+        fi
+
         # Check if the table name is empty
         if [ -z "$table_name" ]; then
             echo "Error: Table name cannot be empty."
